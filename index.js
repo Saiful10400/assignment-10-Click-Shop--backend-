@@ -42,10 +42,17 @@ async function run() {
     app.get("/brand/:name",async(req,res)=>{
       const brandName=req.params.name
       const query={brand:brandName}
-      console.log(query)
+     
       const cursor=await database.find(query)
        res.send(await cursor.toArray())
       
+    })
+    // get best deal data.
+    app.get("/products/best_deals",async(req,res)=>{
+      const query={bestdeall:"true"}
+      const result=await database.find(query)
+      res.send(await result.toArray())
+
     })
 
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
