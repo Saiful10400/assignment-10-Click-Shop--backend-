@@ -1,7 +1,7 @@
 const express = require("express");
 const app=express()
 const cors=require("cors")
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 // middlewares.
@@ -32,9 +32,10 @@ async function run() {
 
     const database = client.db("Electronic_shop").collection("Products")
     
-
+// all post methodes here.
     app.post("/send/phone",async(req,res)=>{
         const data=req.body
+        console.log("hittinng")
         const result=await database.insertOne(data)
         await res.send(result)
     })
@@ -47,12 +48,51 @@ async function run() {
        res.send(await cursor.toArray())
       
     })
+    // data get by id.
+    app.get("/update/:id",async(req,res)=>{
+      const id=req.params.id
+      const query={_id:new ObjectId(id)}
+     
+      const cursor=await database.findOne(query)
+      await res.send(cursor)
+      
+    })
     // get best deal data.
     app.get("/products/best_deals",async(req,res)=>{
       const query={bestdeall:"true"}
       const result=await database.find(query)
       res.send(await result.toArray())
 
+    })
+    // get flagship
+    app.get("/products/flagship",async(req,res)=>{
+      const query={quality:"flagship",type:"phone"}
+      const result=await database.find(query)
+      res.send(await result.toArray())
+
+    })
+    // update fild handle.
+    app.post("/product/update",async(req,res)=>{
+      const data=req.body
+      const query={_id:new ObjectId(data.id)}
+      const willUpdate={
+        $set:{
+          productName:data.productName,
+          url:data.url,
+          brand:data.brand,
+          type:data.type,
+          price:data.price,
+          ratings:data.ratings,
+          description:data.description,
+          quality:data.quality,
+          ram:data.ram,
+          rom:data.rom,
+          bestdeall:data.bestdeall
+        }
+      }
+      const option={upsert:true}
+      const result=await database.updateOne(query,willUpdate,option)
+      await res.send(result)
     })
 
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -71,9 +111,6 @@ app.get("/",(req,res)=>{
     res.send("server is running")
 })
 
-app.get("/user",(req,res)=>{
-    res.send("we are now on user route.")
-})
 
 app.listen(port)
 
