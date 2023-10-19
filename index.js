@@ -29,7 +29,15 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+
+    const database = client.db("Electronic_shop").collection("Products")
     
+
+    app.post("/send/phone",async(req,res)=>{
+        const data=req.body
+        console.log(data)
+    })
+
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     
