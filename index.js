@@ -35,7 +35,17 @@ async function run() {
 
     app.post("/send/phone",async(req,res)=>{
         const data=req.body
-        console.log(data)
+        const result=await database.insertOne(data)
+        await res.send(result)
+    })
+    // data get by brand.
+    app.get("/brand/:name",async(req,res)=>{
+      const brandName=req.params.name
+      const query={brand:brandName}
+      console.log(query)
+      const cursor=await database.find(query)
+       res.send(await cursor.toArray())
+      
     })
 
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
